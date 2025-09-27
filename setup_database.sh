@@ -27,9 +27,46 @@ if [ -f "$DB_FILE" ]; then
     rm -f "$DB_FILE"
 fi
 
-# Create fresh database from schema
-echo "🆕 Creating fresh database from schema.sql..."
-sqlite3 "$DB_FILE" < schema.sql
+# Check if .env file exists
+if [ ! -f ".env" ]; then
+    echo "📝 Creating .env file from .env.example..."
+    cp .env.example .env
+fi
+
+# Reset Prisma migrations for fresh setup
+echo "🔄 Resetting Prisma migrations..."
+rm -rf prisma/migrations
+
+# Create database using Prisma migrations (proper method)
+echo "🆕 Creating fresh database with Prisma migrations..."
+npx prisma migrate dev --name init --create-only
+npx prisma migrate deploy
+
+# Generate Prisma client
+echo "🛠️  Generating Prisma client..."
+npx prisma generate
+
+# Add sample data using Prisma
+echo "📝 Adding sample data..."
+sqlite3 "$DB_FILE" "
+INSERT OR IGNORE INTO \"pastes\" (\"id\", \"title\", \"content\", \"language\", \"isPublic\") VALUES 
+('demo_paste_001', 'Welcome to Advanced Pastebin', 'console.log(\"Hello, World! Welcome to Advanced Pastebin by Murr\");
+
+// This is a demonstration paste
+// Features:
+// - Syntax highlighting
+// - Line numbers (toggle with button)
+// - Dark/Light themes
+// - Search functionality
+// - Admin panel
+// - SQLite database with Prisma ORM
+
+function welcomeMessage() {
+    return \"Enjoy using Advanced Pastebin!\";
+}
+
+welcomeMessage();', 'javascript', true);
+"
 
 # Verify database creation
 echo "✅ Database created successfully!"
@@ -37,7 +74,7 @@ echo ""
 echo "📊 Database Statistics:"
 echo "----------------------"
 sqlite3 "$DB_FILE" "
-SELECT 'Tables created: ' || COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';
+SELECT 'Tables created: ' || COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_prisma_migrations';
 SELECT 'Indexes created: ' || COUNT(*) FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%';
 SELECT 'Sample pastes: ' || COUNT(*) FROM pastes;
 "
@@ -48,8 +85,9 @@ echo "   File: $DB_FILE"
 echo "   Size: $(ls -lh $DB_FILE | awk '{print $5}')"
 echo ""
 echo "💡 Next steps:"
-echo "   1. Update your .env file with DATABASE_URL=\"file:./$DB_FILE\""
-echo "   2. Run: npm run db:generate"
-echo "   3. Start the application: npm run dev"
+echo "   1. Start the application: npm run dev"
+echo "   2. Visit: http://localhost:3000"
+echo "   3. Access admin panel: http://localhost:3000/admin"
 echo ""
 echo "🔐 Don't forget to create an admin user via the application interface!"
+echo "📝 Database and Prisma client are ready to use!"
