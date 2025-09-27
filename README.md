@@ -2,6 +2,11 @@
 
 A modern, GitHub-style pastebin service built with TypeScript, Express.js, and SQLite.
 
+<img width="2463" height="1249" alt="image" src="https://github.com/user-attachments/assets/49840d81-cffb-4686-ab00-d862c690e85b" />
+
+<img width="1901" height="1094" alt="image" src="https://github.com/user-attachments/assets/42e2ba7e-4ffa-462e-bbb3-d09a9337568b" />
+
+
 ## Features
 
 - 📝 **Modern UI**: GitHub-inspired design with dark/light theme toggle
@@ -12,7 +17,6 @@ A modern, GitHub-style pastebin service built with TypeScript, Express.js, and S
 - 🔒 **Security**: Rate limiting, CSP headers, and XSS protection
 - 📱 **Responsive**: Mobile-friendly navigation and layout
 - 🔍 **Search**: Full-text search with SQLite compatibility
-- ⚡ **Performance**: Optimized CSS (39% size reduction)
 
 ## Quick Setup
 
@@ -72,30 +76,6 @@ npm start
 
 The server will start on http://localhost:3000
 
-## API Endpoints
-
-- `GET /` - Home page with paste creation form
-- `POST /paste` - Create a new paste
-- `GET /paste/:id` - View a paste
-- `GET /raw/:id` - Get paste content as raw text
-- `GET /api/paste/:id` - Get paste data as JSON
-- `GET /recent` - View recent pastes
-
-## Project Structure
-
-```
-├── server.js          # Main server file
-├── package.json       # Dependencies and scripts
-├── views/             # EJS templates
-│   ├── index.ejs     # Home page
-│   ├── paste.ejs     # Paste view
-│   ├── recent.ejs    # Recent pastes
-│   └── error.ejs     # Error page
-└── public/           # Static files
-    ├── styles.css    # CSS styles
-    └── script.js     # Client-side JavaScript
-```
-
 ## Configuration
 
 - **Port**: Set via `PORT` environment variable (default: 3000)
@@ -103,8 +83,6 @@ The server will start on http://localhost:3000
 
 ## Notes
 
-- This is a simple implementation using in-memory storage
-- For production use, implement proper database storage
 - Consider adding rate limiting and input validation for production
 - HTTPS is recommended for production deployment
 
