@@ -1,0 +1,33 @@
+<%- include('partials/header', { title: 'Recent Pastes' }) %>
+    <div class="container">
+
+        <main>
+            <div class="recent-pastes">
+                <h2>Recent Pastes</h2>
+                
+                <% if (pastes.length === 0) { %>
+                    <p>No recent pastes found.</p>
+                <% } else { %>
+                    <div class="paste-list">
+                        <% pastes.forEach(function(paste) { %>
+                            <div class="paste-item">
+                                <h4><a href="/paste/<%= paste.id %>"><%= paste.title || 'Untitled' %></a></h4>
+                                <div class="paste-meta">
+                                    <span>Created: <%= paste.createdAt.toLocaleString() %></span>
+                                    <span>Views: <%= paste.views %></span>
+                                    <% if (paste.language) { %>
+                                        <span class="language-tag"><%= paste.language %></span>
+                                    <% } %>
+                                </div>
+                                <div class="paste-preview">
+                                    <%= paste.content.substring(0, 200) %><% if (paste.content.length > 200) { %>...<% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+<%- include('partials/footer') %>

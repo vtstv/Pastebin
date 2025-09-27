@@ -1,0 +1,114 @@
+<%- include('../partials/admin-header', { 
+    title: 'Access Logs', 
+    pageTitle: 'Access Logs',
+    page: 'logs'
+}) %>
+            <div class="admin-section">
+                <div class="logs-header">
+                    <h2>Access Logs</h2>
+                    <div class="results-info">
+                        Total: <%= result.total %> | Page <%= result.page %> of <%= result.totalPages %>
+                    </div>
+                </div>
+
+                <div class="logs-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Action</th>
+                                <th>IP Address</th>
+                                <th>User Agent</th>
+                                <th>Paste ID</th>
+                                <th>Metadata</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% result.data.forEach(function(log) { %>
+                                <tr>
+                                    <td class="log-timestamp">
+                                        <%= log.timestamp.toLocaleString() %>
+                                    </td>
+                                    <td class="log-action">
+                                        <span class="action-<%= log.action.toLowerCase() %>">
+                                            <%= log.action %>
+                                        </span>
+                                    </td>
+                                    <td class="log-ip">
+                                        <%= log.ipAddress %>
+                                    </td>
+                                    <td class="log-user-agent">
+                                        <span title="<%= log.userAgent || 'N/A' %>">
+                                            <%= (log.userAgent || 'N/A').substring(0, 30) %><% if (log.userAgent && log.userAgent.length > 30) { %>...<% } %>
+                                        </span>
+                                    </td>
+                                    <td class="log-paste-id">
+                                        <% if (log.pasteId) { %>
+                                            <a href="/paste/<%= log.pasteId %>" target="_blank">
+                                                <%= log.pasteId.substring(0, 8) %>...
+                                            </a>
+                                        <% } else { %>
+                                            -
+                                        <% } %>
+                                    </td>
+                                    <td class="log-metadata">
+                                        <% if (log.metadata) { %>
+                                            <details>
+                                                <summary>View</summary>
+                                                <pre><%= JSON.stringify(JSON.parse(log.metadata), null, 2) %></pre>
+                                            </details>
+                                        <% } else { %>
+                                            -
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <% if (result.totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (result.page > 1) { %>
+                            <a href="?page=<%= result.page - 1 %>">&larr; Previous</a>
+                        <% } %>
+                        
+                        <span>Page <%= result.page %> of <%= result.totalPages %></span>
+                        
+                        <% if (result.page < result.totalPages) { %>
+                            <a href="?page=<%= result.page + 1 %>">Next &rarr;</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        window.logout = async function logout() {
+            try {
+                const response = await fetch('/admin/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/admin/login';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // Ensure theme is initialized on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initTheme === 'function') {
+                initTheme();
+            }
+        });
+    </script>
+
+        </main>
+    </div>
+
+<%- include('../partials/footer') %>

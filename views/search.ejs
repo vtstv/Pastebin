@@ -1,0 +1,96 @@
+<%- include('partials/header', { title: 'Search' }) %>
+    <div class="container">
+
+        <main>
+            <div class="search-container">
+                <h2>Search Pastes</h2>
+                
+                <form class="search-form" method="GET" action="/search">
+                    <div class="search-row">
+                        <div class="form-group">
+                            <input type="text" name="q" placeholder="Search in titles and content..." value="<%= query.q || '' %>">
+                        </div>
+                        <div class="form-group">
+                            <select name="language">
+                                <option value="">All Languages</option>
+                                <option value="javascript" <%= query.language === 'javascript' ? 'selected' : '' %>>JavaScript</option>
+                                <option value="python" <%= query.language === 'python' ? 'selected' : '' %>>Python</option>
+                                <option value="java" <%= query.language === 'java' ? 'selected' : '' %>>Java</option>
+                                <option value="cpp" <%= query.language === 'cpp' ? 'selected' : '' %>>C++</option>
+                                <option value="html" <%= query.language === 'html' ? 'selected' : '' %>>HTML</option>
+                                <option value="css" <%= query.language === 'css' ? 'selected' : '' %>>CSS</option>
+                                <option value="sql" <%= query.language === 'sql' ? 'selected' : '' %>>SQL</option>
+                                <option value="json" <%= query.language === 'json' ? 'selected' : '' %>>JSON</option>
+                            </select>
+                        </div>
+                        <button type="submit">Search</button>
+                    </div>
+                    
+                    <div class="search-options">
+                        <div class="form-group">
+                            <select name="sortBy">
+                                <option value="createdAt" <%= query.sortBy === 'createdAt' ? 'selected' : '' %>>Date Created</option>
+                                <option value="views" <%= query.sortBy === 'views' ? 'selected' : '' %>>Views</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="sortOrder">
+                                <option value="desc" <%= query.sortOrder === 'desc' ? 'selected' : '' %>>Descending</option>
+                                <option value="asc" <%= query.sortOrder === 'asc' ? 'selected' : '' %>>Ascending</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+                <% if (typeof result !== 'undefined') { %>
+                    <div class="search-results">
+                        <div class="results-header">
+                            <h3>Found <%= result.total %> pastes</h3>
+                            <span class="results-info">
+                                Page <%= result.page %> of <%= result.totalPages %>
+                            </span>
+                        </div>
+
+                        <% if (result.data.length === 0) { %>
+                            <p class="no-results">No pastes found matching your criteria.</p>
+                        <% } else { %>
+                            <div class="paste-list">
+                                <% result.data.forEach(function(paste) { %>
+                                    <div class="paste-item">
+                                        <h3><a href="/paste/<%= paste.id %>"><%= paste.title || 'Untitled' %></a></h3>
+                                        <div class="paste-meta">
+                                            <span>Created: <%= paste.createdAt.toLocaleString() %></span>
+                                            <span>Views: <%= paste.views %></span>
+                                            <% if (paste.language) { %>
+                                                <span class="language-tag"><%= paste.language %></span>
+                                            <% } %>
+                                        </div>
+                                        <div class="paste-preview">
+                                            <%= paste.content.substring(0, 200) %><% if (paste.content.length > 200) { %>...<% } %>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+
+                            <!-- Pagination -->
+                            <% if (result.totalPages > 1) { %>
+                                <div class="pagination">
+                                    <% if (result.page > 1) { %>
+                                        <a href="?<%= new URLSearchParams({...query, page: result.page - 1}).toString() %>">&larr; Previous</a>
+                                    <% } %>
+                                    
+                                    <span>Page <%= result.page %> of <%= result.totalPages %></span>
+                                    
+                                    <% if (result.page < result.totalPages) { %>
+                                        <a href="?<%= new URLSearchParams({...query, page: result.page + 1}).toString() %>">Next &rarr;</a>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+<%- include('partials/footer') %>

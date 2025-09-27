@@ -1,0 +1,151 @@
+<%- include('partials/header', { title: paste.title || 'Untitled', includeHighlight: true }) %>
+    <div class="container">
+
+        <main>
+            <div class="paste-view">
+                <div class="paste-info">
+                    <h2><%= paste.title || 'Untitled' %></h2>
+                    <div class="meta">
+                        <span>Created: <%= paste.createdAt.toLocaleString() %></span>
+                        <span>Views: <%= paste.views %></span>
+                        <% if (paste.language) { %>
+                            <span>Language: <%= paste.language %></span>
+                        <% } %>
+                        <% if (paste.expiresAt) { %>
+                            <span>Expires: <%= paste.expiresAt.toLocaleString() %></span>
+                        <% } %>
+                        <% if (!paste.isPublic) { %>
+                            <span class="private">Private</span>
+                        <% } %>
+                    </div>
+                    <div class="actions">
+                        <a href="/raw/<%= paste.id %>" target="_blank">Raw</a>
+                        <button onclick="copyContent()">Copy Content</button>
+                        <button onclick="copyToClipboard(window.location.href)">Copy URL</button>
+                        <button onclick="toggleLineNumbers()">Show Line Numbers</button>
+                    </div>
+                </div>
+
+                <div class="paste-content" id="paste-container">
+                    <pre><code id="code-content" class="<%= paste.language ? 'language-' + paste.language : '' %>"><%= paste.content %></code></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+            addLineNumbers();
+        });
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showNotification('Copied to clipboard!');
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+                fallbackCopyTextToClipboard(text);
+            });
+        }
+
+        function copyContent() {
+            // Always copy the original content without line numbers
+            const content = originalContent !== null ? originalContent : document.querySelector('#code-content').textContent;
+            copyToClipboard(content);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // Store original content for toggling
+        let originalContent = null;
+        let hasLineNumbers = false;
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function toggleLineNumbers() {
+            const codeElement = document.getElementById('code-content');
+            const button = document.querySelector('button[onclick="toggleLineNumbers()"]');
+            
+            if (!codeElement) return;
+
+            if (!hasLineNumbers) {
+                // Show line numbers - store original and add line numbers
+                if (originalContent === null) {
+                    originalContent = codeElement.textContent;
+                }
+                
+                const lines = originalContent.split('\n');
+                const numberedLines = lines.map((line, index) => 
+                    `<span class="line-number-prefix">${index + 1}.  </span>${escapeHtml(line)}`
+                );
+                codeElement.innerHTML = numberedLines.join('\n');
+                
+                hasLineNumbers = true;
+                if (button) button.textContent = 'Hide Line Numbers';
+            } else {
+                // Hide line numbers - restore original content
+                if (originalContent !== null) {
+                    codeElement.textContent = originalContent;
+                }
+                
+                hasLineNumbers = false;
+                if (button) button.textContent = 'Show Line Numbers';
+            }
+            
+            // Re-apply syntax highlighting after content change
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightElement(codeElement);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showNotification('Copied to clipboard!');
+                }
+            } catch (err) {
+                console.error('Fallback: Could not copy text: ', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+    </script>
+
+<%- include('partials/footer', { additionalScripts: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'] }) %>

@@ -1,0 +1,43 @@
+{
+  "name": "Advanced Pastebin",
+  "build": { "dockerfile": "Dockerfile" },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-js-debug",
+        "Prisma.prisma",
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      }
+    }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Pastebin Server",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npm install && cp .env.example .env && npx prisma generate",
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "file:./pastebin.db"
+  },
+  "remoteUser": "root"
+}

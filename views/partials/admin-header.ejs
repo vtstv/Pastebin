@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Advanced Pastebin</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="admin-header">
+            <h1><%= pageTitle %></h1>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard" class="<%= page === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+                <a href="/admin/pastes" class="<%= page === 'pastes' ? 'active' : '' %>">Manage Pastes</a>
+                <a href="/admin/logs" class="<%= page === 'logs' ? 'active' : '' %>">Access Logs</a>
+                <a href="/" target="_blank">View Site</a>
+                <button onclick="toggleTheme()" class="theme-toggle admin-theme-toggle" title="Toggle theme">🌙</button>
+                <a href="#" onclick="logout()">Logout</a>
+            </nav>
+        </header>
+
+        <main class="admin-main">

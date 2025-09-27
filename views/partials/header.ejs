@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Pastebin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <% if (typeof includeHighlight !== 'undefined' && includeHighlight) { %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <% } %>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="main-header">
+                <h1>Pastebin</h1>
+                <div class="header-controls">
+                    <div class="quick-search">
+                        <form action="/search" method="GET" class="search-form-header" onsubmit="handleQuickSearch(event)">
+                            <input type="text" name="q" placeholder="Quick search..." class="search-input" id="quick-search-input" autocomplete="off">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </form>
+                        <div id="search-results" class="search-dropdown"></div>
+                    </div>
+                    <nav class="main-nav">
+                        <div class="nav-toggle" onclick="toggleMobileNav()">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="nav-links">
+                            <a href="/">New Paste</a>
+                            <a href="/recent">Recent Pastes</a>
+                            <a href="/search">Search</a>
+                            <% if (typeof showAdminLink !== 'undefined' && showAdminLink) { %>
+                            <a href="/admin">Admin</a>
+                            <% } %>
+                            <button onclick="toggleTheme()" class="theme-toggle" title="Toggle theme">🌙</button>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>

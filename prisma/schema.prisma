@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Paste {
+  id          String   @id @default(cuid())
+  title       String?
+  content     String
+  language    String?
+  password    String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+  views       Int      @default(0)
+  isPublic    Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+  
+  // Metadata for logging
+  creatorIp   String?
+  userAgent   String?
+  
+  // Search indexing
+  @@index([createdAt])
+  @@index([isDeleted, isPublic])
+  @@index([expiresAt])
+  @@map("pastes")
+}
+
+model Admin {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  email       String?
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@map("admins")
+}
+
+model AccessLog {
+  id          String   @id @default(cuid())
+  pasteId     String?
+  action      String   // CREATE, VIEW, DELETE, SEARCH, etc.
+  ipAddress   String
+  userAgent   String?
+  timestamp   DateTime @default(now())
+  metadata    String?  // Additional data as JSON string
+  
+  @@index([timestamp])
+  @@index([action])
+  @@index([pasteId])
+  @@map("access_logs")
+}

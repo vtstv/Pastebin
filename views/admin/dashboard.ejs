@@ -1,0 +1,128 @@
+<%- include('../partials/admin-header', { 
+    title: 'Admin Dashboard', 
+    pageTitle: 'Admin Dashboard',
+    page: 'dashboard'
+}) %>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Pastes</h3>
+                    <div class="stat-number"><%= stats.totalPastes %></div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Total Views</h3>
+                    <div class="stat-number"><%= stats.totalViews %></div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Pastes Today</h3>
+                    <div class="stat-number"><%= stats.pastesToday %></div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Expired Pastes</h3>
+                    <div class="stat-number"><%= stats.expiredPastes %></div>
+                    <button onclick="cleanupExpired()" class="cleanup-btn">Cleanup</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    <% if (stats.recentActivity && stats.recentActivity.length > 0) { %>
+                        <% stats.recentActivity.forEach(function(log) { %>
+                            <div class="activity-item">
+                                <div class="activity-info">
+                                    <span class="activity-action"><%= log.action %></span>
+                                    <span class="activity-ip"><%= log.ipAddress %></span>
+                                    <span class="activity-time"><%= log.timestamp.toLocaleString() %></span>
+                                </div>
+                                <% if (log.pasteId) { %>
+                                    <div class="activity-paste">
+                                        <a href="/paste/<%= log.pasteId %>" target="_blank">View Paste</a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No recent activity.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="admin-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <button onclick="refreshStats()">Refresh Stats</button>
+                    <button onclick="exportData()">Export Data</button>
+                    <button onclick="viewLogs()">View All Logs</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        window.logout = async function logout() {
+            try {
+                const response = await fetch('/admin/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/admin/login';
+                } else {
+                    alert('Logout failed');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Logout failed');
+            }
+        }
+
+        async function cleanupExpired() {
+            if (confirm('Are you sure you want to cleanup expired pastes?')) {
+                try {
+                    const response = await fetch('/admin/cleanup', {
+                        method: 'POST'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert(`Cleaned up ${result.count} expired pastes`);
+                        location.reload();
+                    } else {
+                        alert('Cleanup failed: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Cleanup error:', error);
+                    alert('Cleanup failed');
+                }
+            }
+        }
+
+        function refreshStats() {
+            location.reload();
+        }
+
+        function exportData() {
+            // This would implement data export functionality
+            alert('Export functionality would be implemented here');
+        }
+
+        function viewLogs() {
+            window.location.href = '/admin/logs';
+        }
+        
+        // Ensure theme is initialized on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initTheme === 'function') {
+                initTheme();
+            }
+        });
+    </script>
+
+        </main>
+    </div>
+
+<%- include('../partials/footer') %>

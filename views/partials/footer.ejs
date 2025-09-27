@@ -1,0 +1,17 @@
+    <footer class="site-footer">
+        <div class="container">
+            <p class="footer-copyright">
+                &copy; 2025 Pastebin by 
+                <a href="https://github.com/vtstv/pastebin" target="_blank" rel="noopener noreferrer">Murr</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <% if (typeof additionalScripts !== 'undefined' && additionalScripts) { %>
+        <% additionalScripts.forEach(function(script) { %>
+            <script src="<%= script %>"></script>
+        <% }) %>
+    <% } %>
+</body>
+</html>
